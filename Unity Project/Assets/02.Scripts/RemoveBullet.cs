@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,6 +25,8 @@ public class RemoveBullet : MonoBehaviour
         Quaternion rot = Quaternion.FromToRotation(-Vector3.forward, contact.normal);
 
         //스파크 효과를 생성
-        Instantiate(sparkEffect, contact.point, rot);
+        GameObject spark = Instantiate(sparkEffect, contact.point + (-contact.normal * 0.05f), rot);
+        //스파크 효과의 부모를 드럼통 또는 벽으로 설정
+        spark.transform.SetParent(this.transform);
     }
 }
