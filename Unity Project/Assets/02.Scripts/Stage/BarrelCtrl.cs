@@ -28,12 +28,16 @@ public class BarrelCtrl : MonoBehaviour
     //폭발음 오디오 클립
     public AudioClip expSfx;
 
+    //Shake 클래스를 저장할 변수
+    private Shake shake;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         meshFilter = GetComponent<MeshFilter>();
         _renderer = GetComponent<MeshRenderer>();
         _audio = GetComponent<AudioSource>();
+        shake = GameObject.Find("CameraRig").GetComponent<Shake>();
         _renderer.material.mainTexture = textures[Random.Range(0, textures.Length)];
     }
 
@@ -73,6 +77,9 @@ public class BarrelCtrl : MonoBehaviour
 
         //폭발음 발생
         _audio.PlayOneShot(expSfx, 1.0f);
+
+        //셰이크 효과 호출
+        StartCoroutine(shake.ShakeCamera(0.1f, 0.2f, 0.5f));
     }
 
     //폭발력을 주변에 전달하는 함수
