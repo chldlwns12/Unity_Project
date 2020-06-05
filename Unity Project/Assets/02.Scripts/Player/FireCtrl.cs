@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [System.Serializable]
 public struct PlayerSfx
@@ -37,6 +39,21 @@ public class FireCtrl : MonoBehaviour
     //Shake 쿨래스를 저장할 변수
     private Shake shake;
 
+    //탄창 이미지 Image UI
+    public Image magazineImg;
+    //남은 총알 수 Text UI
+    public Text magazineText;
+
+    //최대 총알 수
+    public int maxBullet = 10;
+    //남은 총알 수
+    public int remainingBullet = 10;
+
+    //재장전 시간
+    public float reloadTime = 2.0f;
+    //재장전 여부를 판단할 변수
+    private bool isReloading = false;
+
     void Start()
     {
         muzzleFlash = firePos.GetComponentInChildren<ParticleSystem>();
@@ -47,9 +64,17 @@ public class FireCtrl : MonoBehaviour
     void Update()
     {
         //마우스 왼쪽 버튼을 클릭했을 때 Fire 함수 호출
-        if(Input.GetMouseButton(0))
+        if(!isReloading && Input.GetMouseButtonDown(0))
         {
+            //총알 수를 하나 감소
+            --remainingBullet;
             Fire();
+
+            //남은 총알이 없을 경우 재장전 코루틴 호출
+            if(remainingBullet == 0)
+            {
+                StartCoroutine(Reloading());
+            }
         }
     }
 
@@ -58,13 +83,26 @@ public class FireCtrl : MonoBehaviour
         //셰이크 효과 호출
         StartCoroutine(shake.ShakeCamera());
         //Bullet 프리팹을 동적으로 생성
-        Instantiate(bullet, firePos.position, firePos.rotation);
+        //Instantiate(bullet, firePos.position, firePos.rotation);
+        var _bullet = GameManager.instance.GetBullet();
+        if(_bullet != null)
+        {
+            _bullet.transform.position = firePos.position;
+            _bullet.transform.rotation = firePos.rotation;
+            _bullet.SetActive(true);
+        }
         //파티클 실행
         cartridge.Play();
         //총구 화염 파티클 실행
         muzzleFlash.Play();
         //사운드 발생
         FireSfx();
+
+        //재장전 이미지의 fillAmount 속성값 지정
+        magazineImg.fillAmount = (float)remainingBullet / (float)maxBullet;
+        Debug.Log("fillAmunt : " + magazineImg.fillAmount);
+        //남은 총알 수 갱신
+        UpdateBulletText();
     }
 
     private void FireSfx()
@@ -76,5 +114,27 @@ public class FireCtrl : MonoBehaviour
         
         //사운드 발생
         _audio.PlayOneShot(_sfx, 1.0f);
+    }
+
+    IEnumerator Reloading()
+    {
+        isReloading = true;
+        _audio.PlayOneShot(playerSfx.reload[(int)currWeapon], 1.0f);
+
+        //재장전 오디오의 길이 + 0.3초 동안 대기
+        yield return new WaitForSeconds(playerSfx.reload[(int)currWeapon].length + 0.3f);
+
+        //각종 변숫값의 초기화
+        isReloading = false;
+        magazineImg.fillAmount = 1.0f;
+        remainingBullet = maxBullet;
+        //남은 총알 수 갱신
+        UpdateBulletText();
+    }
+
+    private void UpdateBulletText()
+    {
+        //(남은 총알 수 / 최대 총알 수) 표시
+        magazineText.text = string.Format("<color=#ff0000>{0}</color>/{1}", remainingBullet, maxBullet);
     }
 }
