@@ -20,10 +20,10 @@ TagManager:
   - BARREL
   - BULLET
   - E_BULLET
-  - 
-  - 
-  - 
-  - 
+  - PLAYER_RT
+  - ENEMY
+  - OBSTACLE
+  - PLAYER
   - 
   - 
   - 

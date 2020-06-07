@@ -23,9 +23,21 @@ public class Damage : MonoBehaviour
     public delegate void PlayerDieHandler();
     public static event PlayerDieHandler OnPlayerDie;
 
+    private void OnEnable()
+    {
+        GameManager.OnItemChange += UpdateSetup;
+    }
+
+    void UpdateSetup()
+    {
+        initHp = GameManager.instance.gameData.hp;
+        currHp += GameManager.instance.gameData.hp - currHp;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        initHp = GameManager.instance.gameData.hp;
         currHp = initHp;
 
         //생명 게이지의 초기 색상을 설정

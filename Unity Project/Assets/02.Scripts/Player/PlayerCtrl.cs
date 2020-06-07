@@ -33,6 +33,16 @@ public class PlayerCtrl : MonoBehaviour
     [HideInInspector]
     public Animation anim;
 
+    private void OnEnable()
+    {
+        GameManager.OnItemChange += UpdateSetup;
+    }
+
+    void UpdateSetup()
+    {
+        moveSpeed = GameManager.instance.gameData.speed;
+    }
+
     void Start()
     {
         tr = GetComponent<Transform>();
@@ -40,6 +50,9 @@ public class PlayerCtrl : MonoBehaviour
         //Animation 컴포넌트의 애니메이션 클립을 지정하고 실행
         anim.clip = playerAnim.idle;
         anim.Play();
+
+        //불러온 데이터 값을 movsSpeed에 적용
+        moveSpeed = GameManager.instance.gameData.speed;
     }
 
     void Update()

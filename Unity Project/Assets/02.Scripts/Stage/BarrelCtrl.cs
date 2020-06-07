@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BarrelCtrl : MonoBehaviour
 {
@@ -37,8 +38,18 @@ public class BarrelCtrl : MonoBehaviour
         meshFilter = GetComponent<MeshFilter>();
         _renderer = GetComponent<MeshRenderer>();
         _audio = GetComponent<AudioSource>();
-        shake = GameObject.Find("CameraRig").GetComponent<Shake>();
+        //shake = GameObject.Find("CameraRig").GetComponent<Shake>();
+        StartCoroutine(GetShake());
         _renderer.material.mainTexture = textures[Random.Range(0, textures.Length)];
+    }
+
+    IEnumerator GetShake()
+    {
+        while (!UnityEngine.SceneManagement.SceneManager.GetSceneByName("Play").isLoaded)
+        {
+            yield return null;
+        }
+        shake = GameObject.Find("CameraRig").GetComponent<Shake>();
     }
 
     //충돌이 발생했을 때 한 번 호출되는 태그를 비교
